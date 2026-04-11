@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高级个人信息卡片</title>
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family: Arial, Helvetica, sans-serif;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+transition:0.3s;
+background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+}
+
+.container{
+text-align:center;
+}
+
+.card-wrapper{
+perspective:1000px;
+}
+
+.card{
+width:340px;
+height:480px;
+position:relative;
+transform-style:preserve-3d;
+transition:0.6s;
+}
+
+.flip{
+transform:rotateY(180deg);
+}
+.card-front,.card-back{
+position:absolute;
+width:100%;
+height:100%;
+backface-visibility:hidden;
+background:white;
+padding:30px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+.card-back{
+transform:rotateY(180deg);
+}
+
+.avatar{
+width:100px;
+height:100px;
+border-radius:50%;
+object-fit:cover;
+margin-bottom:15px;
+border:3px solid #74ebd5;
+}
+
+.display-name{
+font-size:22px;
+font-weight:bold;
+margin-top:10px;
+}
+
+.display-bio{
+color:#666;
+margin-top:10px;
+}
+
+input,textarea{
+width:100%;
+padding:8px;
+margin:8px 0;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+button{
+background:#74ebd5;
+border:none;
+color:white;
+padding:10px 15px;
+border-radius:8px;
+cursor:pointer;
+margin:5px;
+transition:0.3s;
+}
+
+button:hover{
+background:#4facfe;
+}
+
+.theme-selector{
+margin-top:10px;
+}
+.theme1{
+background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+}
+.theme2{
+background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+}
+.theme3{
+background: linear-gradient(135deg, #667eea, #764ba2);
+}
+</style>
+
+</head>
+
+<body class="theme1">
+
+<div class="container">
+<h1>个人信息卡片</h1>
+
+<div class="card-wrapper">
+
+<div class="card" id="card">
+
+<div class="card-front" id="capture">
+
+<img src="https://via.placeholder.com/100" class="avatar" id="avatar">
+
+<div class="display-name" id="displayName">你的名字</div>
+<div class="display-bio" id="displayBio">这里是你的个人简介...</div>
+
+<button onclick="flipCard()">编辑</button>
+<button onclick="downloadCard()">导出图片</button>
+
+</div>
+
+<div class="card-back">
+
+<input type="file" id="upload" accept="image/*">
+<input type="text" id="name" placeholder="输入姓名">
+<textarea id="bio" rows="3" placeholder="输入简介"></textarea>
+
+<button onclick="saveInfo()">保存</button>
+<button onclick="flipCard()">返回</button>
+
+<div class="theme-selector">
+<button onclick="changeTheme('theme1')">主题1</button>
+<button onclick="changeTheme('theme2')">主题2</button>
+<button onclick="changeTheme('theme3')">主题3</button>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function flipCard(){
+document.getElementById('card').classList.toggle('flip')
+}
+
+function saveInfo(){
+const name=document.getElementById('name').value
+const bio=document.getElementById('bio').value
+
+if(name){
+document.getElementById('displayName').innerText=name
+localStorage.setItem('name',name)
+}
+
+if(bio){
+document.getElementById('displayBio').innerText=bio
+localStorage.setItem('bio',bio)
+}
+
+flipCard()
+}
+
+document.getElementById('upload').addEventListener('change',function(){
+const file=this.files[0]
+if(file){
+const reader=new FileReader()
+reader.onload=function(e){
+document.getElementById('avatar').src=e.target.result
+localStorage.setItem('avatar',e.target.result)
+}
+reader.readAsDataURL(file)
+}
+})
+
+function changeTheme(theme){
+document.body.className=theme
+localStorage.setItem('theme',theme)
+}
+
+function downloadCard(){
+html2canvas(document.querySelector("#capture")).then(canvas=>{
+const link=document.createElement('a')
+link.download='profile-card.png'
+link.href=canvas.toDataURL()
+link.click()
+})
+}
+
+window.onload=function(){
+
+const name=localStorage.getItem('name')
+const bio=localStorage.getItem('bio')
+const avatar=localStorage.getItem('avatar')
+const theme=localStorage.getItem('theme')
+
+if(name){
+document.getElementById('displayName').innerText=name
+}
+
+if(bio){
+document.getElementById('displayBio').innerText=bio
+}
+
+if(avatar){
+document.getElementById('avatar').src=avatar
+}
+
+if(theme){
+document.body.className=theme
+}
+
+}
+</script>
+</body>
+</html>
+
